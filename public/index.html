@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Toys API Documentation</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --ok: #34d399;
+      --warn: #fbbf24;
+      --bad: #f87171;
+      --line: #334155;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+    }
+    header {
+      padding: 28px 20px 16px;
+      border-bottom: 1px solid var(--line);
+      background: #0b1220;
+    }
+    h1 { margin: 0 0 8px; font-size: 28px; }
+    .sub { color: var(--muted); margin: 0; }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 20px; }
+    .lang {
+      margin-top: 14px;
+      display: flex;
+      gap: 8px;
+    }
+    button.tab {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--line);
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button.tab.active { border-color: var(--accent); color: var(--accent); }
+    section { margin: 28px 0; }
+    h2 { color: var(--accent); margin-bottom: 8px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: top;
+      font-size: 14px;
+    }
+    th { background: #162033; color: #cbd5e1; }
+    code, pre {
+      font-family: ui-monospace, Consolas, monospace;
+      background: #0b1220;
+      color: #7dd3fc;
+    }
+    code { padding: 1px 6px; border-radius: 4px; }
+    pre {
+      padding: 12px;
+      border-radius: 8px;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+    }
+    .method { font-weight: 700; }
+    .GET { color: var(--ok); }
+    .POST { color: var(--warn); }
+    .PUT { color: var(--accent); }
+    .DELETE { color: var(--bad); }
+    .note {
+      background: var(--card);
+      border-left: 4px solid var(--accent);
+      padding: 10px 14px;
+      border-radius: 6px;
+      color: var(--muted);
+    }
+    .rtl { direction: rtl; text-align: right; }
+    .hidden { display: none; }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>Toys API</h1>
+      <p class="sub">Node.js + Express + MongoDB REST API — port 3001</p>
+      <div class="lang">
+        <button class="tab active" id="btn-en" onclick="showLang('en')">English</button>
+        <button class="tab" id="btn-he" onclick="showLang('he')">עברית</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap" id="en">
+    <section>
+      <h2>Base URL</h2>
+      <p><code>http://localhost:3001</code></p>
+      <p class="note">Protected routes (POST / PUT / DELETE toys) require header <code>x-api-key: YOUR_JWT_TOKEN</code>. Get a token from <code>POST /users/login</code>.</p>
+    </section>
+
+    <section>
+      <h2>Users</h2>
+      <table>
+        <tr><th>Method</th><th>Route</th><th>What it does</th></tr>
+        <tr><td class="method GET">GET</td><td><code>/users</code></td><td>Health check for users router</td></tr>
+        <tr><td class="method GET">GET</td><td><code>/users/userInfo</code></td><td>Returns the logged-in user (token required, password hidden)</td></tr>
+        <tr><td class="method POST">POST</td><td><code>/users</code></td><td>Register. Password is hashed with bcrypt. Duplicate email returns an error. Role is always USER.</td></tr>
+        <tr><td class="method POST">POST</td><td><code>/users/login</code></td><td>Login with email + password. Returns JWT token.</td></tr>
+      </table>
+      <h3>Register body</h3>
+      <pre>{
+  "name": "Dana Cohen",
+  "email": "dana@gmail.com",
+  "password": "123456"
+}</pre>
+      <h3>Login body</h3>
+      <pre>{
+  "email": "dana@gmail.com",
+  "password": "123456"
+}</pre>
+    </section>
+
+    <section>
+      <h2>Toys</h2>
+      <p>Pagination: <code>?skip=0</code> is page 1 (first 10 toys), <code>?skip=1</code> is page 2, and so on. Limit is always 10.</p>
+      <table>
+        <tr><th>Method</th><th>Route</th><th>What it does</th></tr>
+        <tr><td class="method GET">GET</td><td><code>/toys</code></td><td>List toys. Bonus filters: <code>?s=</code> search, <code>?category=</code>, <code>?min=</code> &amp; <code>?max=</code>, plus <code>?skip=</code></td></tr>
+        <tr><td class="method GET">GET</td><td><code>/toys/search?s=ball&amp;skip=0</code></td><td>Search in name OR info</td></tr>
+        <tr><td class="method GET">GET</td><td><code>/toys/category/Outdoor?skip=0</code></td><td>Toys by category</td></tr>
+        <tr><td class="method GET">GET</td><td><code>/toys/prices?min=10&amp;max=40&amp;skip=0</code></td><td>Toys in a price range</td></tr>
+        <tr><td class="method GET">GET</td><td><code>/toys/single/:id</code></td><td>One toy as an object</td></tr>
+        <tr><td class="method GET">GET</td><td><code>/toys/count</code></td><td>Number of toys in the collection</td></tr>
+        <tr><td class="method POST">POST</td><td><code>/toys</code></td><td>Add toy. Token required. Server sets user_id from the token.</td></tr>
+        <tr><td class="method PUT">PUT</td><td><code>/toys/:id</code></td><td>Edit toy. Token required. Only owner or ADMIN.</td></tr>
+        <tr><td class="method DELETE">DELETE</td><td><code>/toys/:id</code></td><td>Delete toy. Token required. Only owner or ADMIN.</td></tr>
+      </table>
+      <h3>Toy body (POST / PUT)</h3>
+      <pre>{
+  "name": "Soccer Ball Size 4",
+  "info": "Durable outdoor soccer ball",
+  "category": "Outdoor",
+  "img_url": "https://images.pexels.com/photos/47730/the-ball-stadion-football-the-pitch-47730.jpeg",
+  "price": 25
+}</pre>
+    </section>
+
+    <section>
+      <h2>Permissions</h2>
+      <table>
+        <tr><th>USER</th><th>ADMIN</th></tr>
+        <tr>
+          <td>Can add toys. Can edit/delete only toys whose user_id matches the token.</td>
+          <td>Can add toys. Can edit/delete any toy.</td>
+        </tr>
+      </table>
+    </section>
+  </div>
+
+  <div class="wrap rtl hidden" id="he">
+    <section>
+      <h2>כתובת בסיס</h2>
+      <p><code>http://localhost:3001</code></p>
+      <p class="note">ראוטים מוגנים (הוספה / עריכה / מחיקה של צעצועים) דורשים כותרת <code>x-api-key: YOUR_JWT_TOKEN</code>. את הטוקן מקבלים מ־<code>POST /users/login</code>.</p>
+    </section>
+
+    <section>
+      <h2>משתמשים</h2>
+      <table>
+        <tr><th>שיטה</th><th>ראוט</th><th>מה זה עושה</th></tr>
+        <tr><td class="method GET">GET</td><td><code>/users</code></td><td>בדיקה שהראוטר עובד</td></tr>
+        <tr><td class="method GET">GET</td><td><code>/users/userInfo</code></td><td>מחזיר את המשתמש המחובר (חובה טוקן, בלי סיסמה)</td></tr>
+        <tr><td class="method POST">POST</td><td><code>/users</code></td><td>הרשמה. הסיסמה מוצפנת ב־bcrypt. מייל כפול מחזיר שגיאה. התפקיד תמיד USER.</td></tr>
+        <tr><td class="method POST">POST</td><td><code>/users/login</code></td><td>התחברות עם אימייל וסיסמה. מחזיר טוקן JWT.</td></tr>
+      </table>
+    </section>
+
+    <section>
+      <h2>צעצועים</h2>
+      <p>עימוד: <code>?skip=0</code> זה עמוד 1 (10 צעצועים ראשונים), <code>?skip=1</code> עמוד 2. ה־LIMIT תמיד 10.</p>
+      <table>
+        <tr><th>שיטה</th><th>ראוט</th><th>מה זה עושה</th></tr>
+        <tr><td class="method GET">GET</td><td><code>/toys</code></td><td>רשימת צעצועים. בונוס: <code>?s=</code> חיפוש, <code>?category=</code>, <code>?min=</code> ו־<code>?max=</code>, וגם <code>?skip=</code></td></tr>
+        <tr><td class="method GET">GET</td><td><code>/toys/search?s=ball&amp;skip=0</code></td><td>חיפוש לפי name או info</td></tr>
+        <tr><td class="method GET">GET</td><td><code>/toys/category/Outdoor?skip=0</code></td><td>צעצועים לפי קטגוריה</td></tr>
+        <tr><td class="method GET">GET</td><td><code>/toys/prices?min=10&amp;max=40&amp;skip=0</code></td><td>טווח מחירים</td></tr>
+        <tr><td class="method GET">GET</td><td><code>/toys/single/:id</code></td><td>רשומה אחת כאובייקט</td></tr>
+        <tr><td class="method GET">GET</td><td><code>/toys/count</code></td><td>מספר הרשומות בקולקשן</td></tr>
+        <tr><td class="method POST">POST</td><td><code>/toys</code></td><td>הוספת צעצוע. חובה טוקן. השרת שם user_id מהטוקן.</td></tr>
+        <tr><td class="method PUT">PUT</td><td><code>/toys/:id</code></td><td>עריכה. חובה טוקן. רק הבעלים או ADMIN.</td></tr>
+        <tr><td class="method DELETE">DELETE</td><td><code>/toys/:id</code></td><td>מחיקה. חובה טוקן. רק הבעלים או ADMIN.</td></tr>
+      </table>
+    </section>
+  </div>
+
+  <script>
+    function showLang(lang) {
+      document.getElementById("en").classList.toggle("hidden", lang !== "en");
+      document.getElementById("he").classList.toggle("hidden", lang !== "he");
+      document.getElementById("btn-en").classList.toggle("active", lang === "en");
+      document.getElementById("btn-he").classList.toggle("active", lang === "he");
+      document.documentElement.lang = lang === "he" ? "he" : "en";
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: toys-nodejs-mongo-api
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node app.js
+    envVars:
+      - key: PORT
+        value: 3001
+      - key: MONGO_URL
+        sync: false
+      - key: TOKEN_SECRET
+        generateValue: true
